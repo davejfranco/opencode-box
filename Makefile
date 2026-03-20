@@ -24,14 +24,14 @@ base:
 		--build-arg HOST_UID=$(HOST_UID) \
 		--build-arg HOST_GID=$(HOST_GID) \
 		--build-arg LOCAL_TOOLS=$(LOCAL_TOOLS) \
-		-t agent-base:dev \
+		-t agent-base \
 		-f base/Dockerfile base
 
 open-code: base
 	@echo "Building open-code"
 	$(CONTAINER_ENGINE) build \
 		--no-cache \
-		-t open-code:dev \
+		-t open-code \
 		-f open-code/Dockerfile open-code
 
 install:
