@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+PROJ="$(basename "$(pwd)")"
+NAME="open-code-${PROJ}"
+
+exec docker run --rm --tty --interactive \
+  --name "$NAME" \
+  --add-host=host.docker.internal:host-gateway \
+  -e AWS_PAGER="" \
+  -v "$HOME/.aws:/home/node/.aws" \
+  -v "$HOME/.kube:/home/node/.kube" \
+  -v "$HOME/.local/state/opencode:/home/node/.local/state/opencode" \
+  -v "$HOME/.local/share/opencode:/home/node/.local/share/opencode" \
+  -v "$HOME/.config/opencode:/home/node/.config/opencode" \
+  -v "$(pwd):/app:rw" \
+  open-code:dev "$@"
