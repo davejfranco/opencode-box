@@ -1,6 +1,9 @@
 # OpenCode Box
 
+***Inspired by***: https://github.com/faileon/agent-containers/tree/main/open-code
+
 This repository builds a containerized `opencode` environment so you can run the OpenCode AI agent inside an isolated container while working against your local project directory.
+
 
 ## What It Includes
 
