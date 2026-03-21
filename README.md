@@ -60,7 +60,7 @@ make install INSTALL_DIR=/somewhere/on/your/path
 
 Use the wrapper script at `open-code/opencode-box`, or run the installed `opencode-box` command after `make install`.
 
-It starts the container interactively and mounts:
+It starts the container interactively, loads credentials from `~/.config/opencode/credentials.env` when present, and mounts:
 
 - your current working directory to `/app`
 - your OpenCode state and config directories
@@ -96,5 +96,17 @@ On startup, the container entrypoint:
 
 - The wrapper currently uses the `open-code` image tag
 - AWS paging is disabled in the wrapper so `aws` commands work even if a pager is unavailable
-- GitHub CLI reuses your host auth via the `~/.config/gh` mount
+- GitHub CLI preferences come from the `~/.config/gh` mount, but API auth can be provided through `~/.config/opencode/credentials.env`
 - `host.docker.internal` is added so tools in the container can access services running on your host machine
+
+### Credentials
+
+For secrets needed inside the container, create `~/.config/opencode/credentials.env` on the host.
+
+Example:
+
+```dotenv
+GH_TOKEN=your_github_token_here
+```
+
+The wrapper passes that file to Docker with `--env-file` when it exists. This is the recommended way to provide GitHub authentication when your host `gh` stores tokens in a system credential store instead of `~/.config/gh/hosts.yml`.

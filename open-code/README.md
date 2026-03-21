@@ -58,6 +58,7 @@ Startup is slightly slower because the container boots first, but that cost give
 The wrapper:
 
 - adds `host.docker.internal` so the container can reach services running on your host
+- loads credentials from `~/.config/opencode/credentials.env` when that file exists
 - mounts your current project into `/app`
 - mounts OpenCode state, share, and config directories
 - mounts your AWS config from `~/.aws`
@@ -73,10 +74,17 @@ Current wrapper script:
 
 PROJ="$(basename "$(pwd)")"
 NAME="open-code-${PROJ}"
+ENV_FILE="$HOME/.config/opencode/credentials.env"
+ENV_FILE_ARGS=()
+
+if [ -f "$ENV_FILE" ]; then
+  ENV_FILE_ARGS=(--env-file "$ENV_FILE")
+fi
 
 exec docker run --rm --tty --interactive \
   --name "$NAME" \
   --add-host=host.docker.internal:host-gateway \
+  "${ENV_FILE_ARGS[@]}" \
   -e AWS_PAGER="" \
   -e GH_PAGER=cat \
   -v "$HOME/.aws:/home/agent/.aws" \
@@ -98,6 +106,18 @@ opencode-box
 ./open-code/opencode-box aws sts get-caller-identity --profile personal
 ./open-code/opencode-box kubectl config get-contexts
 ```
+
+## Credentials
+
+Put runtime secrets in `~/.config/opencode/credentials.env` on the host.
+
+Example:
+
+```dotenv
+GH_TOKEN=your_github_token_here
+```
+
+The wrapper forwards that file to Docker with `--env-file` when present. This is the preferred way to authenticate `gh` in the container when `~/.config/gh` does not contain the token itself.
 
 ## Runtime Flow
 

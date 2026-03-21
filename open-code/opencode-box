@@ -2,10 +2,17 @@
 
 PROJ="$(basename "$(pwd)")"
 NAME="open-code-${PROJ}"
+ENV_FILE="$HOME/.config/opencode/credentials.env"
+ENV_FILE_ARGS=()
+
+if [ -f "$ENV_FILE" ]; then
+  ENV_FILE_ARGS=(--env-file "$ENV_FILE")
+fi
 
 exec docker run --rm --tty --interactive \
   --name "$NAME" \
   --add-host=host.docker.internal:host-gateway \
+  "${ENV_FILE_ARGS[@]}" \
   -e AWS_PAGER="" \
   -e GH_PAGER=cat \
   -v "$HOME/.aws:/home/agent/.aws" \
