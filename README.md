@@ -10,7 +10,6 @@ This repository builds a Debian-based `opencode` environment so you can run the 
 - A reusable base image with common development and DevOps tooling
 - A dedicated non-root `agent` user inside the container
 - OpenCode CLI plus Claude Code installed globally
-- A bundled Claude Max proxy started automatically on container launch
 - Support for working against your current local repository via a bind mount
 
 The box is set up with several DevOps-oriented tools in the image, including:
@@ -87,9 +86,7 @@ Or pass a command directly:
 
 On startup, the container entrypoint:
 
-- starts the Claude Max proxy
-- waits for the proxy health check to pass
-- points OpenCode's Anthropic traffic at the local proxy
+- switches to `/app`
 - runs the requested command, such as `opencode`, `bash`, or `aws`
 
 ## Notes

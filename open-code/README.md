@@ -43,7 +43,6 @@ The image includes:
 
 - `opencode-ai`
 - `@anthropic-ai/claude-code`
-- Claude Max proxy, started automatically by the entrypoint
 - DevOps tooling such as `aws`, `kubectl`, `terraform`, and `tofu`
 - Go tooling via the official `go` distribution
 - Python tooling such as `pipx` and `ansible`
@@ -100,9 +99,7 @@ opencode-box
 
 On container startup, `entrypoint.sh`:
 
-- starts the Claude Max proxy in the background
-- waits for its health endpoint to become ready
-- points Anthropic-compatible traffic at the local proxy
+- switches to `/app`
 - executes the requested command
 
 ## References
