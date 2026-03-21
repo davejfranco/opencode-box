@@ -2,11 +2,11 @@
 set -e
 
 echo "Starting Claude Max Proxy (Passthrough Mode)..."
-ln -sf /home/node/.claude/claude.json /home/node/.claude.json
+ln -sf /home/agent/.claude/claude.json /home/agent/.claude.json
 export CLAUDE_PROXY_PASSTHROUGH=1
 
 # Start the proxy supervisor in the background
-cd /home/node/opencode-claude-max-proxy
+cd /home/agent/opencode-claude-max-proxy
 ./bin/claude-proxy-supervisor.sh >/tmp/claude-proxy.log 2>&1 &
 
 # Return to the app working directory

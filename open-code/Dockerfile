@@ -7,7 +7,7 @@ RUN npm install -g opencode-ai && \
   echo "Installed Open Code version: $(opencode --version)"
 
 # 2. Clone and install the Claude Max Proxy
-WORKDIR /home/node
+WORKDIR /home/agent
 RUN git clone https://github.com/rynfar/opencode-claude-max-proxy.git && \
   cd opencode-claude-max-proxy && \
   bun install
@@ -16,14 +16,14 @@ RUN git clone https://github.com/rynfar/opencode-claude-max-proxy.git && \
 FROM agent-base
 
 # Copy the installed global modules from builder
-COPY --from=builder --chown=node:node /home/node/.npm-global /home/node/.npm-global
+COPY --from=builder --chown=agent:agent /home/agent/.npm-global /home/agent/.npm-global
 
 # Copy the proxy app from builder
-COPY --from=builder --chown=node:node /home/node/opencode-claude-max-proxy /home/node/opencode-claude-max-proxy
+COPY --from=builder --chown=agent:agent /home/agent/opencode-claude-max-proxy /home/agent/opencode-claude-max-proxy
 
 # Copy and configure the entrypoint script
-COPY --chown=node:node entrypoint.sh /home/node/entrypoint.sh
-RUN chmod +x /home/node/entrypoint.sh
+COPY --chown=agent:agent entrypoint.sh /home/agent/entrypoint.sh
+RUN chmod +x /home/agent/entrypoint.sh
 
 # Display version information
 RUN echo "" && \
@@ -35,5 +35,5 @@ RUN echo "" && \
   echo ""
 
 # Route container startup through our script
-ENTRYPOINT ["/home/node/entrypoint.sh"]
+ENTRYPOINT ["/home/agent/entrypoint.sh"]
 CMD ["opencode"]

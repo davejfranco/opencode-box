@@ -2,12 +2,13 @@
 
 ***Inspired by***: https://github.com/faileon/agent-containers/tree/main/open-code
 
-This repository builds a containerized `opencode` environment so you can run the OpenCode AI agent inside an isolated container while working against your local project directory.
+This repository builds a Debian-based `opencode` environment so you can run the OpenCode AI agent inside an isolated container while working against your local project directory.
 
 
 ## What It Includes
 
 - A reusable base image with common development and DevOps tooling
+- A dedicated non-root `agent` user inside the container
 - OpenCode CLI plus Claude Code installed globally
 - A bundled Claude Max proxy started automatically on container launch
 - Support for working against your current local repository via a bind mount
@@ -18,7 +19,9 @@ The box is set up with several DevOps-oriented tools in the image, including:
 - `kubectl`
 - `terraform`
 - `tofu`
-- `git`, `curl`, `jq`, `ripgrep`, `python3`, and other common CLI utilities
+- `go`
+- `pipx` and `ansible`
+- `git`, `curl`, `jq`, `ripgrep`, `python3`, `node`, `npm`, `bun`, and other common CLI utilities
 
 ## Build
 
@@ -36,8 +39,8 @@ make install-open-code
 
 This builds:
 
-- `agent-base:dev` from `base/Dockerfile`
-- `open-code:dev` from `open-code/Dockerfile`
+- `agent-base` from `base/Dockerfile`
+- `open-code` from `open-code/Dockerfile`
 
 ## Install The Launcher
 
@@ -64,6 +67,8 @@ It starts the container interactively and mounts:
 - your AWS config from `~/.aws`
 - your Kubernetes config from `~/.kube`
 
+Those host directories are mounted into the container under `/home/agent`.
+
 Example:
 
 ```bash
@@ -89,6 +94,6 @@ On startup, the container entrypoint:
 
 ## Notes
 
-- The wrapper currently uses the `open-code:dev` image tag
+- The wrapper currently uses the `open-code` image tag
 - AWS paging is disabled in the wrapper so `aws` commands work even if a pager is unavailable
 - `host.docker.internal` is added so tools in the container can access services running on your host machine

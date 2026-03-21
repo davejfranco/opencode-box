@@ -8,7 +8,7 @@ HOST_UID := $(shell id -u)
 HOST_GID := $(shell id -g)
 
 # Tools to install in to the containers with apt-get
-LOCAL_TOOLS := "git curl jq ripgrep vim nano make zip unzip openssh-client wget tree imagemagick build-essential python3 python3-pip ca-certificates gnupg less groff-base"
+LOCAL_TOOLS := "git curl jq ripgrep vim nano make zip unzip openssh-client wget tree imagemagick build-essential python3 python3-pip pipx ca-certificates gnupg less groff-base xz-utils procps"
 
 # Launcher install location
 INSTALL_DIR ?= $(HOME)/.local/bin
@@ -47,7 +47,7 @@ install-open-code: open-code install
 
 clean:
 	@echo "Removing container images"
-	@for image in open-code claude-code openai-codex agent-base; do \
+	@for image in open-code agent-base; do \
 		if $(CONTAINER_ENGINE) image inspect $$image > /dev/null 2>&1; then \
 			echo "Removing $$image"; \
 			$(CONTAINER_ENGINE) rmi -f $$image; \

@@ -1,6 +1,6 @@
 # Open Code
 
-This image packages `opencode` into a containerized development box so you can run the agent against your local repository without installing everything directly on your host.
+This image packages `opencode` into a Debian-based development box so you can run the agent against your local repository without installing everything directly on your host.
 
 ## Build
 
@@ -18,8 +18,8 @@ make install-open-code
 
 This builds:
 
-- `agent-base:dev` from `base/Dockerfile`
-- `open-code:dev` from `open-code/Dockerfile`
+- `agent-base` from `base/Dockerfile`
+- `open-code` from `open-code/Dockerfile`
 
 You can add more apt-installed tools by extending `LOCAL_TOOLS` in the top-level `Makefile`.
 
@@ -45,7 +45,10 @@ The image includes:
 - `@anthropic-ai/claude-code`
 - Claude Max proxy, started automatically by the entrypoint
 - DevOps tooling such as `aws`, `kubectl`, `terraform`, and `tofu`
-- Common CLI tools including `git`, `curl`, `jq`, `ripgrep`, `python3`, and Bun
+- Go tooling via the official `go` distribution
+- Python tooling such as `pipx` and `ansible`
+- Common CLI tools including `git`, `curl`, `jq`, `ripgrep`, `python3`, Node.js, npm, and Bun
+- A dedicated non-root `agent` user for interactive work
 
 ## Run
 
@@ -60,6 +63,7 @@ The wrapper:
 - mounts OpenCode state, share, and config directories
 - mounts your AWS config from `~/.aws`
 - mounts your Kubernetes config from `~/.kube`
+- mounts everything under `/home/agent` inside the container
 - disables AWS CLI paging so `aws` commands work without depending on a pager in the runtime
 
 Current wrapper script:
@@ -74,13 +78,13 @@ exec docker run --rm --tty --interactive \
   --name "$NAME" \
   --add-host=host.docker.internal:host-gateway \
   -e AWS_PAGER="" \
-  -v "$HOME/.aws:/home/node/.aws" \
-  -v "$HOME/.kube:/home/node/.kube" \
-  -v "$HOME/.local/state/opencode:/home/node/.local/state/opencode" \
-  -v "$HOME/.local/share/opencode:/home/node/.local/share/opencode" \
-  -v "$HOME/.config/opencode:/home/node/.config/opencode" \
+  -v "$HOME/.aws:/home/agent/.aws" \
+  -v "$HOME/.kube:/home/agent/.kube" \
+  -v "$HOME/.local/state/opencode:/home/agent/.local/state/opencode" \
+  -v "$HOME/.local/share/opencode:/home/agent/.local/share/opencode" \
+  -v "$HOME/.config/opencode:/home/agent/.config/opencode" \
   -v "$(pwd):/app:rw" \
-  open-code:dev "$@"
+  open-code "$@"
 ```
 
 Example usage:
