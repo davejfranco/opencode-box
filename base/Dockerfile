@@ -61,7 +61,18 @@ RUN install -m 0755 -d /etc/apt/keyrings && \
   kubectl version --client && \
   rm -rf /var/lib/apt/lists/*
 
-# 6. Install Terraform from the official HashiCorp apt repository
+# 6. Install GitHub CLI from the official apt repository
+RUN install -m 0755 -d /etc/apt/keyrings && \
+  curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/etc/apt/keyrings/githubcli-archive-keyring.gpg && \
+  chmod 0644 /etc/apt/keyrings/githubcli-archive-keyring.gpg && \
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" > /etc/apt/sources.list.d/github-cli.list && \
+  chmod 0644 /etc/apt/sources.list.d/github-cli.list && \
+  apt-get update && \
+  apt-get install -y --no-install-recommends gh && \
+  gh --version && \
+  rm -rf /var/lib/apt/lists/*
+
+# 7. Install Terraform from the official HashiCorp apt repository
 RUN install -m 0755 -d /etc/apt/keyrings && \
   curl -fsSL https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg && \
   chmod 0644 /usr/share/keyrings/hashicorp-archive-keyring.gpg && \
@@ -71,7 +82,7 @@ RUN install -m 0755 -d /etc/apt/keyrings && \
   terraform version && \
   rm -rf /var/lib/apt/lists/*
 
-# 7. Install OpenTofu from the official apt repository
+# 8. Install OpenTofu from the official apt repository
 RUN install -m 0755 -d /etc/apt/keyrings && \
   curl -fsSL https://get.opentofu.org/opentofu.gpg > /etc/apt/keyrings/opentofu.gpg && \
   curl -fsSL https://packages.opentofu.org/opentofu/tofu/gpgkey | gpg --no-tty --batch --dearmor -o /etc/apt/keyrings/opentofu-repo.gpg && \
@@ -83,24 +94,24 @@ RUN install -m 0755 -d /etc/apt/keyrings && \
   tofu version && \
   rm -rf /var/lib/apt/lists/*
 
-# 8. Install Bun by copying from the official image
+# 9. Install Bun by copying from the official image
 COPY --from=oven/bun:1 /usr/local/bin/bun /usr/local/bin/bun
 RUN ln -s /usr/local/bin/bun /usr/local/bin/bunx
 
-# 9. Install Playwright system dependencies for Chromium
+# 10. Install Playwright system dependencies for Chromium
 RUN npx playwright install-deps chromium
 
-# 10. Enable Corepack
+# 11. Enable Corepack
 RUN corepack enable
 
-# 11. Create the runtime user and workspace
+# 12. Create the runtime user and workspace
 RUN groupadd --gid "${HOST_GID}" agent && \
   useradd --uid "${HOST_UID}" --gid "${HOST_GID}" --create-home --shell /bin/bash agent && \
   install -d -o agent -g agent /app
 
 WORKDIR /app
 
-# 12. Switch to the non-root runtime user
+# 13. Switch to the non-root runtime user
 USER agent
 
 ENV NPM_CONFIG_PREFIX=/home/agent/.npm-global
@@ -115,19 +126,19 @@ RUN mkdir -p /home/agent/.npm-global && \
   mkdir -p /home/agent/.bun/bin && \
   mkdir -p /home/agent/go/bin
 
-# 13. Install Ansible with pipx for the runtime user
+# 14. Install Ansible with pipx for the runtime user
 RUN pipx --version && \
   pipx install ansible-core && \
   ansible --version
 
-# 14. Install agent-browser for the runtime user
+# 15. Install agent-browser for the runtime user
 RUN npm install -g agent-browser && \
   agent-browser install
 
-# 15. Configure the interactive shell
+# 16. Configure the interactive shell
 RUN echo "export PATH=/home/agent/.local/bin:/home/agent/.npm-global/bin:/home/agent/.bun/bin:/home/agent/go/bin:/usr/local/go/bin:\$PATH" >> /home/agent/.bashrc
 
-# 16. Copy aliases
+# 17. Copy aliases
 COPY --chown=agent:agent ./.bash_aliases /home/agent/.bash_aliases
 RUN echo "if [ -f ~/.bash_aliases ]; then . ~/.bash_aliases; fi" >> /home/agent/.bashrc
 

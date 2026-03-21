@@ -18,6 +18,7 @@ The box is set up with several DevOps-oriented tools in the image, including:
 - `kubectl`
 - `terraform`
 - `tofu`
+- `gh`
 - `go`
 - `pipx` and `ansible`
 - `git`, `curl`, `jq`, `ripgrep`, `python3`, `node`, `npm`, `bun`, and other common CLI utilities
@@ -64,6 +65,7 @@ It starts the container interactively and mounts:
 - your current working directory to `/app`
 - your OpenCode state and config directories
 - your AWS config from `~/.aws`
+- your GitHub CLI config from `~/.config/gh`
 - your Kubernetes config from `~/.kube`
 
 Those host directories are mounted into the container under `/home/agent`.
@@ -79,6 +81,7 @@ Or pass a command directly:
 
 ```bash
 ./open-code/opencode-box aws sts get-caller-identity --profile personal
+./open-code/opencode-box gh auth status
 ./open-code/opencode-box kubectl config get-contexts
 ```
 
@@ -93,4 +96,5 @@ On startup, the container entrypoint:
 
 - The wrapper currently uses the `open-code` image tag
 - AWS paging is disabled in the wrapper so `aws` commands work even if a pager is unavailable
+- GitHub CLI reuses your host auth via the `~/.config/gh` mount
 - `host.docker.internal` is added so tools in the container can access services running on your host machine

@@ -43,7 +43,7 @@ The image includes:
 
 - `opencode-ai`
 - `@anthropic-ai/claude-code`
-- DevOps tooling such as `aws`, `kubectl`, `terraform`, and `tofu`
+- DevOps tooling such as `aws`, `gh`, `kubectl`, `terraform`, and `tofu`
 - Go tooling via the official `go` distribution
 - Python tooling such as `pipx` and `ansible`
 - Common CLI tools including `git`, `curl`, `jq`, `ripgrep`, `python3`, Node.js, npm, and Bun
@@ -61,6 +61,7 @@ The wrapper:
 - mounts your current project into `/app`
 - mounts OpenCode state, share, and config directories
 - mounts your AWS config from `~/.aws`
+- mounts your GitHub CLI config from `~/.config/gh`
 - mounts your Kubernetes config from `~/.kube`
 - mounts everything under `/home/agent` inside the container
 - disables AWS CLI paging so `aws` commands work without depending on a pager in the runtime
@@ -77,7 +78,9 @@ exec docker run --rm --tty --interactive \
   --name "$NAME" \
   --add-host=host.docker.internal:host-gateway \
   -e AWS_PAGER="" \
+  -e GH_PAGER=cat \
   -v "$HOME/.aws:/home/agent/.aws" \
+  -v "$HOME/.config/gh:/home/agent/.config/gh" \
   -v "$HOME/.kube:/home/agent/.kube" \
   -v "$HOME/.local/state/opencode:/home/agent/.local/state/opencode" \
   -v "$HOME/.local/share/opencode:/home/agent/.local/share/opencode" \
@@ -91,6 +94,7 @@ Example usage:
 ```bash
 ./open-code/opencode-box
 opencode-box
+./open-code/opencode-box gh auth status
 ./open-code/opencode-box aws sts get-caller-identity --profile personal
 ./open-code/opencode-box kubectl config get-contexts
 ```
